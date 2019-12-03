@@ -11,14 +11,33 @@ class App extends Component {
     ]
   }
 
-  addItem(name) {    
-    const todo = { 
-      id: this.state.todos[this.state.todos.length - 1].id + 1, 
-      name, 
-      complete: false, 
-    };    
-    this.setState({ todos: [...this.state.todos, todo] });
-  };
+  getUniqId = () => {
+    //NOTE We are just using this as a helper function for id's since we aren't using a db yet
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+   }
+
+   addItem = (name) => {
+    const { groceries } = this.state;
+    const grocery = { name, id: this.getUniqId() , complete: false }
+    this.setState({ groceries: [grocery, ...groceries] }); 
+    }
+
+  handleClick = (id) => {
+    const { groceries } = this.state;
+    this.setState({
+      groceries: groceries.map( grocery => {
+        if (grocery.id === id ) {
+          return{
+            ...grocery,
+            complete: !grocery.complete
+          }
+        }
+        return grocery
+      })
+    })
+  }
 
   render() {
     const {groceries} = this.state;
@@ -26,7 +45,7 @@ class App extends Component {
     return (
       <div>
         <GroceryForm addItem={this.addItem} />
-        <List name="Grocery List" items={groceries} />
+        <List name="Grocery List" items={groceries} groceryClick={this.handleClick} />
       </div>
     )
   }
